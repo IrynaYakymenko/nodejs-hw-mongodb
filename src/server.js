@@ -3,10 +3,11 @@ import pino from 'pino-http';
 import cors from 'cors';
 
 import dotenv from 'dotenv';
+import { getContacts, getContactById } from './db/services/contacts.js';
 
 dotenv.config();
 
-const PORT = Number(process.env.PORT);
+const PORT = Number(process.env.PORT) || 3000;
 
 export const setupServer = () => {
   const app = express();
@@ -22,9 +23,30 @@ export const setupServer = () => {
     }),
   );
 
-  app.get('/', (req, res) => {
+  app.get('/contacts', async (req, res) => {
+    const data = await getContacts();
+
     res.json({
-      message: 'Hello world!',
+      status: 200,
+      message: 'Successfully find movies',
+      data,
+    });
+  });
+
+  app.get('/contacts/:id', async (req, res) => {
+    const { id } = req.params;
+    const data = await getContactById(id);
+
+    if (!data) {
+      return res.status(404).json({
+        message: `Contact with id ${id} not found`,
+      });
+    }
+
+    res.json({
+      status: 200,
+      message: `Successfully found contact with id ${id}!`,
+      data,
     });
   });
 
