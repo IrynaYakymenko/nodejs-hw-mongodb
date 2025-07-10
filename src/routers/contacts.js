@@ -17,7 +17,11 @@ import {
   updateContactSchema,
 } from '../validation/contacts.js';
 
+import { authenticate } from '../middlewares/authenticate.js';
+
 const router = Router();
+
+router.use(authenticate);
 
 router.get('/', ctrlWrapper(getContactsController));
 router.get('/:id', isValidId, ctrlWrapper(getContactByIdController));
@@ -36,5 +40,7 @@ router.patch(
   validateBody(updateContactSchema),
   ctrlWrapper(patchContactController),
 );
+
+router.get('/', ctrlWrapper(getContactsController));
 
 export default router;
