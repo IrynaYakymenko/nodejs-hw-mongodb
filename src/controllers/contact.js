@@ -1,10 +1,6 @@
 import { getContacts, getContactById } from '../db/services/contacts.js';
 import createHttpError from 'http-errors';
-import {
-  createContact,
-  deleteContact,
-  updateContact,
-} from '../db/services/contacts.js';
+import { deleteContact, updateContact } from '../db/services/contacts.js';
 
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
