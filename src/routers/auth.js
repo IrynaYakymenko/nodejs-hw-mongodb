@@ -9,6 +9,9 @@ import { logoutUserController } from '../controllers/auth.js';
 import { refreshUserSessionController } from '../controllers/auth.js';
 import { requestResetEmailSchema } from '../validation/auth.js';
 import { requestResetEmailController } from '../controllers/auth.js';
+import { resetPasswordSchema } from '../validation/auth.js';
+import { resetPasswordController } from '../controllers/auth.js';
+import { authenticate } from '../middlewares/authenticate.js';
 
 const router = Router();
 
@@ -26,5 +29,23 @@ router.post(
   validateBody(requestResetEmailSchema),
   ctrlWrapper(requestResetEmailController),
 );
+
+router.post(
+  '/reset-pwd',
+  validateBody(resetPasswordSchema),
+  ctrlWrapper(resetPasswordController),
+);
+
+router.get('/auth/me', authenticate, (req, res) => {
+  res.json({
+    status: 200,
+    message: 'Current user info',
+    data: {
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+    },
+  });
+});
 
 export default router;

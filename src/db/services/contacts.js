@@ -4,6 +4,8 @@ import { calculatePaginationData } from '../../utils/calculatePaginationData.js'
 
 import { SORT_ORDER } from '../../constants/index.js';
 
+import mongoose from 'mongoose';
+
 export const getContacts = async ({
   page = 1,
   perPage = 10,
@@ -52,16 +54,28 @@ export const deleteContact = async (id) => {
 };
 
 export const updateContact = async (id, payload, options = {}) => {
-  const rawResult = await Contact.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-    includeResultMetadata: true,
-    ...options,
-  });
+  const { userId, ...updateData } = payload;
 
-  if (!rawResult || !rawResult.value) return null;
+  const contactId = mongoose.Types.ObjectId.isValid(id)
+    ? new mongoose.Types.ObjectId(id)
+    : id;
+  const userObjectId = mongoose.Types.ObjectId.isValid(userId)
+    ? new mongoose.Types.ObjectId(userId)
+    : userId;
+
+  const rawResult = await Contact.findOneAndUpdate(
+    { _id: contactId, userId: userObjectId },
+    updateData,
+    {
+      new: true,
+      ...options,
+    },
+  );
+
+  if (!rawResult) return null;
 
   return {
-    student: rawResult.value,
+    contact: rawResult.value,
     isNew: Boolean(rawResult?.lastErrorObject?.upserted),
   };
 };

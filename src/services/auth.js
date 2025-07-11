@@ -11,6 +11,12 @@ import { sendEmail } from '../utils/sendMail.js';
 import { FIFTEEN_MINUTES, ONE_DAY } from '../constants/index.js';
 import { Session } from '../db/models/Session.js';
 
+import handlebars from 'handlebars';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+
+const TEMPLATES_DIR = path.join(process.cwd(), 'src', 'templates');
+
 export const registerUser = async (payload) => {
   const user = await User.findOne({ email: payload.email });
   if (user) throw createHttpError(409, 'Email in use');
@@ -107,14 +113,57 @@ export const requestResetToken = async (email) => {
     },
   );
 
-  const resetLink = `${getEnvVar(
-    'APP_DOMAIN',
-  )}/reset-password?token=${resetToken}`;
+  const resetPasswordTemplatePath = path.join(
+    TEMPLATES_DIR,
+    'reset-password-email.html',
+  );
 
-  await sendEmail({
-    from: getEnvVar(SMTP.SMTP_FROM),
-    to: email,
-    subject: 'Reset your password',
-    html: `<p>Click <a href="${resetLink}">here</a> to reset your password!</p>`,
+  const templateSource = (
+    await fs.readFile(resetPasswordTemplatePath)
+  ).toString();
+
+  const template = handlebars.compile(templateSource);
+  const html = template({
+    name: user.name,
+    link: `${getEnvVar('APP_DOMAIN')}/reset-password?token=${resetToken}`,
   });
+
+  try {
+    await sendEmail({
+      from: getEnvVar(SMTP.SMTP_FROM),
+      to: email,
+      subject: 'Reset your password',
+      html,
+    });
+  } catch (error) {
+    console.error('Send mail error:', error);
+    throw createHttpError(
+      500,
+      'Failed to send the email, please try again later.',
+    );
+  }
+};
+
+export const resetPassword = async (payload) => {
+  let entries;
+
+  try {
+    entries = jwt.verify(payload.token, getEnvVar('JWT_SECRET'));
+  } catch (err) {
+    if (err instanceof Error) throw createHttpError(401, err.message);
+    throw err;
+  }
+
+  const user = await User.findOne({
+    email: entries.email,
+    _id: entries.sub,
+  });
+
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+
+  const encryptedPassword = await bcrypt.hash(payload.password, 10);
+
+  await User.updateOne({ _id: user._id }, { password: encryptedPassword });
 };
