@@ -12,9 +12,16 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { UPLOAD_DIR } from './constants/index.js';
 
+import swaggerUi from 'swagger-ui-express';
+import fs from 'node:fs';
+import path from 'node:path';
+
 dotenv.config();
 
 const PORT = Number(process.env.PORT) || 3000;
+
+const swaggerPath = path.resolve('docs/swagger.json');
+const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, 'utf-8'));
 
 export const setupServer = () => {
   const app = express();
@@ -37,13 +44,14 @@ export const setupServer = () => {
     });
   });
 
+  app.use('/uploads', express.static(UPLOAD_DIR));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
   app.use(router);
 
   app.use('', notFoundHandler);
 
   app.use(errorHandler);
-
-  app.use('/uploads', express.static(UPLOAD_DIR));
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
