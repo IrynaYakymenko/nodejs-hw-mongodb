@@ -44,6 +44,4 @@ router.patch(
   ctrlWrapper(patchContactController),
 );
 
-router.get('/', ctrlWrapper(getContactsController));
-
 export default router;
