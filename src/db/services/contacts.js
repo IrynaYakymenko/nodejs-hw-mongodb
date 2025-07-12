@@ -39,23 +39,19 @@ export const getContacts = async ({
   };
 };
 
-export const getContactById = (id) => Contact.findById(id);
+export const getContactById = (id, userId) =>
+  Contact.findOne({ _id: id, userId });
 
 export const createContact = async (payload) => {
   const contact = await Contact.create(payload);
   return contact;
 };
 
-export const deleteContact = async (id) => {
-  const contact = await Contact.findOneAndDelete({
-    _id: id,
-  });
-  return contact;
+export const deleteContact = async (id, userId) => {
+  return await Contact.findOneAndDelete({ _id: id, userId });
 };
 
-export const updateContact = async (id, payload, options = {}) => {
-  const { userId, ...updateData } = payload;
-
+export const updateContact = async (id, userId, payload, options = {}) => {
   const contactId = mongoose.Types.ObjectId.isValid(id)
     ? new mongoose.Types.ObjectId(id)
     : id;
@@ -65,7 +61,7 @@ export const updateContact = async (id, payload, options = {}) => {
 
   const rawResult = await Contact.findOneAndUpdate(
     { _id: contactId, userId: userObjectId },
-    updateData,
+    payload,
     {
       new: true,
       ...options,
