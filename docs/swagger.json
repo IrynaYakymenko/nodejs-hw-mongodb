@@ -142,7 +142,7 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "required": [
@@ -175,6 +175,10 @@
                       "personal"
                     ],
                     "example": "personal"
+                  },
+                  "photo": {
+                    "type": "string",
+                    "format": "binary"
                   }
                 }
               }
@@ -301,7 +305,7 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -329,6 +333,10 @@
                       "personal"
                     ],
                     "example": "work"
+                  },
+                  "photo": {
+                    "type": "string",
+                    "format": "binary"
                   }
                 }
               }
@@ -387,7 +395,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "contactId",
+            "name": "id",
             "required": true,
             "schema": {
               "type": "string",
