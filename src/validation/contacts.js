@@ -8,7 +8,7 @@ export const createContactSchema = Joi.object({
     'any.required': 'Username is required',
   }),
   phoneNumber: Joi.string()
-    .pattern(/^\d{11,13}$/)
+    .pattern(/^\+?\d{11,13}$/)
     .required(),
   email: Joi.string()
     .email({ tlds: { allow: false } })
@@ -29,7 +29,7 @@ export const createContactSchema = Joi.object({
 
 export const updateContactSchema = Joi.object({
   name: Joi.string().min(3).max(20),
-  phoneNumber: Joi.string().pattern(/^\d{11,13}$/),
+  phoneNumber: Joi.string().pattern(/^\+?\d{11,13}$/),
   email: Joi.string().email({ tlds: { allow: false } }),
   isFavourite: Joi.boolean(),
   contactType: Joi.string().valid('work', 'home', 'personal'),

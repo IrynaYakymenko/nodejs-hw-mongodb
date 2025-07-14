@@ -12,7 +12,10 @@ import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { isValidId } from '../middlewares/isValidId.js';
 
-import { createContactSchema } from '../validation/contacts.js';
+import {
+  createContactSchema,
+  updateContactSchema,
+} from '../validation/contacts.js';
 
 import { authenticate } from '../middlewares/authenticate.js';
 import { upload } from '../middlewares/multer.js';
@@ -36,6 +39,7 @@ router.delete('/:id', isValidId, ctrlWrapper(deleteContactController));
 router.patch(
   '/:id',
   isValidId,
+  validateBody(updateContactSchema),
   upload.single('photo'),
 
   ctrlWrapper(patchContactController),
