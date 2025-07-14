@@ -34,20 +34,3 @@ export const updateContactSchema = Joi.object({
   isFavourite: Joi.boolean(),
   contactType: Joi.string().valid('work', 'home', 'personal'),
 }).min(1);
-
-// const dataToValidate = {
-//   name: 'John Doe',
-//   phoneNumber: '+32445677776',
-//   email: 'john.doe@example.com',
-//   isFavourite: true,
-//   contactType: 'home',
-// };
-
-// const validationResult = createContactSchema.validate(dataToValidate, {
-//   abortEarly: false,
-// });
-// if (validationResult.error) {
-//   console.error(validationResult.error.message);
-// } else {
-//   console.log('Data is valid!');
-// }
